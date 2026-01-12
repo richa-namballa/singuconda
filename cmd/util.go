@@ -21,7 +21,7 @@ const SING_CMD_BLOCK = `singularity exec --fakeroot %s --overlay %s %s /bin/bash
 EOFXXX`
 
 const SING_CMD_INTERACTIVE = `
-singularity exec %s \
+singularity exec --fakeroot %s \
 	--overlay %s \
 	%s \
 	/bin/bash --init-file /ext3/env
@@ -70,7 +70,7 @@ SIF="$(cat $SCRIPT_DIR/.$SING_NAME.sifpath)"
 
 # run singularity
 
-singularity exec $NV $@ --overlay "${OVERLAY}%s" "$SIF" /bin/bash "${ARGS[@]}"
+singularity exec --fakeroot $NV $@ --overlay "${OVERLAY}%s" "$SIF" /bin/bash "${ARGS[@]}"
 
 `
 
