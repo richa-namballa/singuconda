@@ -36,7 +36,7 @@ The `~/singuconda` script itself:
 ```bash
 ssh torch  # or whatever your environment is
 
-curl -L https://github.com/richa-namballa/singuconda/raw/main/singuconda --output ~/singuconda
+curl -L https://github.com/beasteers/singuconda/raw/main/singuconda --output ~/singuconda
 chmod +x ~/singuconda
 ```
 
@@ -45,7 +45,7 @@ The singuconda command should always be run from the directory where you want yo
 
 But once they're created, the `sing` script can be run from anywhere.
 
-**Do not run `singuconda` from a login node. Start an interactive job before calling the binary to avoid running out of memory during set-up.**
+**Do NOT run `~/singuconda` from a login node on the HPC cluster. Start an interactive job before calling the binary to avoid slow installations 🐌.**
 
 ```bash
 # cd to your projects directory
@@ -110,12 +110,12 @@ You can customize behavior using environment variables. Set these in your `~/.ba
 export SING_CMD="sing"
 
 # not everyone is at NYU
-export SING_OVERLAY_DIR="/scratch/work/public/overlay-fs-ext3"
-export SING_SIF_DIR="/scratch/work/public/singularity"
+export SING_OVERLAY_DIR="/share/apps/overlay-fs-ext3"
+export SING_SIF_DIR="/share/apps/images/"
 
 # personal preferences
 export SING_DEFAULT_OVERLAY="overlay-5GB-200K.ext3.gz"
-export SING_DEFAULT_SIF="cuda11.0-cudnn8-devel-ubuntu18.04.sif"
+export SING_DEFAULT_SIF="cuda12.3.2-cudnn9.0.0-ubuntu-22.04.4.sif"
 
 ~/singuconda
 ```
@@ -236,6 +236,7 @@ So we have something to copy and paste from ;)
 #SBATCH --gres gpu:1
 #SBATCH --job-name=myjob
 #SBATCH --output logs/job.%J.out
+#SBATCH --account=<YOUR_PROJECTID>
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=<YOUR_USERID>@nyu.edu
 
@@ -255,16 +256,21 @@ And for jupyter:
 #SBATCH --mem 24GB
 #SBATCH --time 8:00:00
 #SBATCH --gres gpu:1
+#SBATCH --account=<YOUR_PROJECTID>
 #SBATCH --job-name=jupyter
 #SBATCH --output logs/jupyter.out
 
 port=$(shuf -i 10000-65500 -n 1)
-/usr/bin/ssh -N -f -R $port:localhost:$port log-1
-/usr/bin/ssh -N -f -R $port:localhost:$port log-2
-/usr/bin/ssh -N -f -R $port:localhost:$port log-3
-echo "To access:"
-echo "ssh -L $port:localhost:$port $USER@login.torch.hpc.nyu.edu"
-echo "ssh -L $port:localhost:$port torch"
+
+echo -e "\nTo access, run one of the following from your local machine:"
+echo -e "ssh -L 8888:localhost:$port $USER@login.torch.hpc.nyu.edu"
+echo -e "ssh -L 8888:localhost:$port torch"
+
+echo -e "\nThen, from that shell, run:"
+echo -e "ssh -L $port:localhost:$port $HOSTNAME"
+
+echo -e "\nIn your local browser, open http://localhost:8888/"
+echo -e "If asked for a token, copy the token from the URL in logs/jupyter.out\n"
 
 ./singrw << EOF
 
@@ -274,7 +280,7 @@ jupyter lab --no-browser --port $port
 EOF
 ```
 
-> Remember that you have to open a new ssh session and forward the port. Check `logs/jupyter.out` for the port number.
+> Remember that you have to open a new ssh session and forward the port. Check `logs/jupyter.out` for the port number and token.
 
 ## Extra Helpers
 Put your things in your home directory
