@@ -1,5 +1,5 @@
 # singuconda 🌈
-Tool for setting up singularity overlays with miniconda - [official NYU Greene docs](https://sites.google.com/nyu.edu/nyu-hpc/hpc-systems/greene/software/singularity-with-miniconda)
+Tool for setting up singularity overlays with miniconda on **NYU Torch** - [official NYU Torch docs](https://services.rt.nyu.edu/docs/hpc/containers/singularity_with_conda/)
 
 ...because nobody likes doing it (until now)
 
@@ -34,9 +34,9 @@ The `~/singuconda` script itself:
 ## Install
 
 ```bash
-ssh greene  # or whatever your environment is
+ssh torch  # or whatever your environment is
 
-curl -L https://github.com/beasteers/singuconda/raw/main/singuconda --output ~/singuconda
+curl -L https://github.com/richa-namballa/singuconda/raw/main/singuconda --output ~/singuconda
 chmod +x ~/singuconda
 ```
 
@@ -44,6 +44,8 @@ chmod +x ~/singuconda
 The singuconda command should always be run from the directory where you want your overlay and sing script to live.
 
 But once they're created, the `sing` script can be run from anywhere.
+
+**Do not run `singuconda` from a login node. Start an interactive job before calling the binary to avoid running out of memory during set-up.**
 
 ```bash
 # cd to your projects directory
@@ -218,8 +220,6 @@ Then you're all done!
 
 You can re-run it if you want to change anything (sif file, python version, installs).
 
-This was built for NYU Greene's environment, but it should apply elsewhere too!
-
 ## Build
 
 ```bash
@@ -263,8 +263,8 @@ port=$(shuf -i 10000-65500 -n 1)
 /usr/bin/ssh -N -f -R $port:localhost:$port log-2
 /usr/bin/ssh -N -f -R $port:localhost:$port log-3
 echo "To access:"
-echo "ssh -L $port:localhost:$port $USER@greene.hpc.nyu.edu"
-echo "ssh -L $port:localhost:$port greene"
+echo "ssh -L $port:localhost:$port $USER@login.torch.hpc.nyu.edu"
+echo "ssh -L $port:localhost:$port torch"
 
 ./singrw << EOF
 
@@ -276,7 +276,7 @@ EOF
 
 > Remember that you have to open a new ssh session and forward the port. Check `logs/jupyter.out` for the port number.
 
-## Extra Greene Helpers
+## Extra Helpers
 Put your things in your home directory
 ```bash
 ln -s /scratch/$USER ~/scratch
